@@ -6,6 +6,7 @@
 #define CALCULATOR_TOOL_H
 
 #include<string>
+#include"Postfix.h"
 class Tool
 {
 public:
@@ -15,6 +16,17 @@ public:
                || s.at(0) == '.';
     }
 
+    static bool isCharNum(const char c) {
+        return c <= '9'
+               && c >= '0'
+               || c == '.';
+    }
+    static bool isBracket(const char c){
+        return c == '(' || c == ')';
+    }
+    static bool isOperator(const char c){
+        return !isCharNum(c) && !isBracket(c);
+    }
 };
 
 #endif //CALCULATOR_TOOL_H
