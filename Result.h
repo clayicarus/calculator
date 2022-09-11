@@ -18,9 +18,9 @@ public:
     Result() = default;
     Result(long double lld) : res(lld) {}
 
-    Result resSin() const { return Result(sin(res)); }
-    Result resCos() const { return Result(cos(res)); }
-    Result resTan() const { return Result(tan(res)); }
+    Result resSin() const { return Result(sinl(res)); }
+    Result resCos() const { return Result(cosl(res)); }
+    Result resTan() const { return Result(tanl(res)); }
 
     explicit Result(const std::string& num) : res(std::stold(num)) {}
     std::string getResStr(void) const { return resStr; }
