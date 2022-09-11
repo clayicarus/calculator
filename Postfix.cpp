@@ -5,14 +5,15 @@
 #include "Postfix.h"
 #include"Tool.h"
 using namespace std;
-// operator not begin with number and sign.
+// operator not begin with number or sign.
 
 const std::string Postfix::negate_x = "~";
 const std::unordered_map<std::string, int> Postfix::prior = {
-        {negate_x, 3},
-        {"*", 2}, {"/", 2},
-        {"+", 1}, {"-", 1},
-        {"(", 0}
+        // another function is 0.
+        {negate_x, -1},
+        {"*", -2}, {"/", -2},
+        {"+", -3}, {"-", -3},
+        {"(", -4}
 };
 const std::unordered_map < std::string, std::function<Result(Result, Result)>>Postfix::binops = {
         {"+", std::plus<Result>()}, {"-", std::minus<Result>()},
@@ -22,7 +23,6 @@ const std::unordered_map < std::string, std::function<Result(Result)>>Postfix::s
         {negate_x, std::negate<Result>()},
 };
 
-#ifdef oldVer1
 void Postfix::fixExpr()
 {
     string exp;
@@ -32,41 +32,13 @@ void Postfix::fixExpr()
             if (i == ' ')
                 continue;
             // +, - x
-            if (i == '-' && !(pst <= '9' && pst >= '0' || pst == ')' || pst == '.')) {
+            if (i == '-' && !Tool::isNum(pst) && pst != ')') {
                 exp += negate_x;
             }
-            else if (i == '+' && !(pst <= '9' && pst >= '0' || pst == ')' || pst == '.')) {
+            else if (i == '+' && !Tool::isNum(pst) && pst != ')') {
                 continue;
             }
-            else {
-                exp.push_back(i);
-            }
-            pst = i;
-        }
-
-        exp += ende;
-        expr = exp;
-        fixed = true;
-    }
-}
-#endif
-
-void Postfix::fixExpr()
-{
-    string exp;
-    char pst('\0');
-    if (!fixed) {
-        for (auto i : expr) {
-            if (i == ' ')
-                continue;
-            // +, - x
-            if (i == '-' && !Tool::isCharNum(pst) && pst != ')') {
-                exp += negate_x;
-            }
-            else if (i == '+' && !Tool::isCharNum(pst) && pst != ')') {
-                continue;
-            }
-            else {
+            else{
                 exp.push_back(i);
             }
             pst = i;
@@ -76,75 +48,6 @@ void Postfix::fixExpr()
         fixed = true;
     }
 }
-
-#ifdef oldVer1
-void Postfix::toPostfix()
-{
-    // chstack to vector<string>
-    string num;
-    string oprtr;
-    vector<char> chstack;
-
-    if (!fixed) {
-        // throw
-    }
-
-    for (const auto& ch : this->expr) {
-        if (ch <= '9' && ch >= '0' || ch == '.') {
-            num.push_back(ch);
-        }
-        else {
-            if (!num.empty()) {
-                postfix.push_back(num);
-                num.clear();
-            }
-            if (string(1, ch) == ende) {
-                break;
-            }
-            else if (ch == '(') {
-                chstack.push_back(ch);
-            }
-            else if (ch == ')') {
-                while (!chstack.empty() && chstack.back() != '(') {
-                    oprtr.clear();
-                    oprtr.push_back(chstack.back());
-                    postfix.push_back(oprtr);
-
-                    chstack.pop_back();
-                }
-                if (chstack.empty()) {
-                    // syntax error: ()
-                }
-                else {  // chastack.back() == '('
-                    chstack.pop_back(); // pop '('
-                }
-            }
-            else { // ch is +-*/
-                while (1) {
-                    if (chstack.empty() || getPrior(chstack.back()) < getPrior(ch)) {
-                        chstack.push_back(ch);
-                        break;
-                    }
-                    else {  // ch_prior <= stack.back()
-                        oprtr.clear();
-                        oprtr.push_back(chstack.back());
-                        postfix.push_back(oprtr);
-
-                        chstack.pop_back();
-                    }
-                }
-            }
-        }
-    }
-    while (!chstack.empty()) {
-        oprtr.clear();
-        oprtr.push_back(chstack.back());
-        postfix.push_back(oprtr);
-
-        chstack.pop_back();
-    }
-}
-#endif
 
 // #include<iostream>
 void Postfix::toPostfix()
@@ -161,8 +64,9 @@ void Postfix::toPostfix()
     i = 0;
     // cout << expr << endl;
     while(i < expr.size()){
-        if(Tool::isCharNum(expr[i])){
-            while(i < expr.size() && Tool::isCharNum(expr[i])){
+        //match num then func
+        if(Tool::isNum(expr[i])){
+            while(i < expr.size() && Tool::isNum(expr[i])){
                 num.push_back(expr[i++]);
             }
             // cout << "test1" << endl;
@@ -200,6 +104,20 @@ void Postfix::toPostfix()
                 }
             }
             continue;
+        }else if(Tool::isFunc_or_var(expr[i])){
+            while(i < expr.size() && Tool::isFunc_or_var(expr[i])){
+                op.push_back(expr[i++]);
+            }
+            while(!op.empty()){
+                if(ostack.empty() || getPrior(ostack.back()) < getPrior(op)){
+                    ostack.push_back(op);
+                    op.clear();
+                }else{
+                    postfix.push_back(ostack.back());
+                    ostack.pop_back();
+                }
+            }
+            continue;
         }else{
             // throw
         }
@@ -210,42 +128,49 @@ void Postfix::toPostfix()
     }
 }
 
-int Postfix::getPrior(const std::string& oprtr) const
+int Postfix::getPrior(const std::string& op) const
 {
     unordered_map<string, int>::const_iterator i;
-    if ((i = prior.find(oprtr)) != prior.end()) {
+    if ((i = prior.find(op)) != prior.end()) {
         return i->second;
     }
-    // throw
-    return -1;
+    // another function
+    return 0;
 }
 
+// #include<iostream>
 void Postfix::calPostfix()
 {
-    // function class
     vector<Result> res;
     Result temp;
     for (const auto& s : postfix) {
-        // s is num or oprtr
+        // s is num or op
         if (Tool::isStrNum(s)) {
             res.push_back(Result(s));
         }
         else {
             // binops
+            if(res.empty()){
+                // cerr << "end of res." << endl;
+                // throw end of res.
+            }
             if (binops.find(s) != binops.end()) {
                 temp = res.back();
                 res.pop_back();
+                if(res.empty()){
+                    // cerr << "end of res." << endl;
+                    // throw end of res.
+                }
                 res.back() = binops.at(s)(res.back(), temp);
             }
             else if (sinops.find(s) != sinops.end()) {
                 res.back() = sinops.at(s)(res.back());
             }
             else {
-                // throw
+                // throw func or op not found.
             }
         }
     }
-    // empty throw
     result = res.empty() ? 0 : res.back();
 }
 

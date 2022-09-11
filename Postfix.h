@@ -30,7 +30,7 @@ public:
     void toPostfix(void);
 private:
     void fixExpr(void);
-    int getPrior(const std::string &oprtr) const;
+    int getPrior(const std::string &op) const;
     int getPrior(char ch) const { return getPrior(std::string() + ch); }
 
     Result result;
