@@ -21,6 +21,9 @@ const std::unordered_map < std::string, std::function<Result(Result, Result)>>Po
 };
 const std::unordered_map < std::string, std::function<Result(Result)>>Postfix::sinops = {
         {negate_x, std::negate<Result>()},
+        {"sin", [](const auto res) ->Result { return res.resSin(); }},
+        {"cos", [](const auto res) ->Result { return res.resCos(); }},
+        {"tan", [](const auto res) ->Result { return res.resTan(); }}
 };
 
 void Postfix::fixExpr()
