@@ -6,6 +6,7 @@
 #define CALCULATOR_RESULT_H
 
 #include<string>
+#include<cmath>
 class Result
 {
     friend Result operator-(Result r);
@@ -16,10 +17,14 @@ class Result
 public:
     Result() = default;
     Result(long double lld) : res(lld) {}
+
+    Result resSin() const { return Result(sin(res)); }
+    Result resCos() const { return Result(cos(res)); }
+    Result resTan() const { return Result(tan(res)); }
+
     explicit Result(const std::string& num) : res(std::stold(num)) {}
     std::string getResStr(void) const { return resStr; }
     void resToString(std::string::size_type bit = 8);
-
 private:
     long double res = 0.0;
     bool strfied = false;

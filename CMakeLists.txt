@@ -3,4 +3,4 @@ project(calculator)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(calculator main.cpp Calculator.cpp Calculator.h Postfix.cpp Postfix.h Result.cpp Result.h Tool.cpp Tool.h)
+add_executable(calculator main.cpp Calculator.cpp Calculator.h Postfix/Postfix.cpp Postfix/Postfix.h Result.cpp Result.h Postfix/Tool.cpp Postfix/Tool.h Postfix/PostFunc.cpp Postfix/PostFunc.h)

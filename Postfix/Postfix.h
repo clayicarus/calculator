@@ -5,7 +5,7 @@
 #ifndef CALCULATOR_POSTFIX_H
 #define CALCULATOR_POSTFIX_H
 
-#include"Result.h"
+#include"../Result.h"
 #include<string>
 #include<vector>
 #include<unordered_map>

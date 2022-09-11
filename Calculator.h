@@ -5,7 +5,7 @@
 #ifndef CALCULATOR_CALCULATOR_H
 #define CALCULATOR_CALCULATOR_H
 
-#include"Postfix.h"
+#include"Postfix/Postfix.h"
 #include"Result.h"
 #include<string>
 class Calculator
