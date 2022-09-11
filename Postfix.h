@@ -14,11 +14,12 @@
 // allow void expr
 class Postfix
 {
-    static const std::string ende;
     static const std::string negate_x;
     static const std::unordered_map<std::string, int> prior;
     static const std::unordered_map < std::string, std::function<Result(Result, Result)>> binops;
     static const std::unordered_map < std::string, std::function<Result(Result)>>sinops;
+
+    friend class Tool;
 public:
     Postfix() = default;
     Postfix(const std::string& expression) : expr(expression), fixed(false), postfix(), result(0) { fixExpr(); }
@@ -29,7 +30,7 @@ public:
     void toPostfix(void);
 private:
     void fixExpr(void);
-    int getPrior(const std::string &oprtr) const;
+    int getPrior(const std::string &op) const;
     int getPrior(char ch) const { return getPrior(std::string() + ch); }
 
     Result result;
